@@ -1,0 +1,1 @@
+web java -Dserver.port=$PORT $JAVA_OPTS -jar target/sos-cobranca-0.0.1-SNAPSHOT.jar
