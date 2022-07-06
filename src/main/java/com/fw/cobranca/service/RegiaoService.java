@@ -1,5 +1,6 @@
 package com.fw.cobranca.service;
 
+import com.fw.cobranca.domain.ColaboradorRegiao;
 import com.fw.cobranca.domain.Regiao;
 import com.fw.cobranca.domain.dto.RegiaoDTO;
 import com.fw.cobranca.repository.RegiaoRepository;
@@ -7,10 +8,7 @@ import com.fw.cobranca.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class RegiaoService implements Util {
@@ -67,6 +65,7 @@ public class RegiaoService implements Util {
         }
 
         return null;
+
     }
 
     public Optional<Regiao> getByRegiao(String regiao) {

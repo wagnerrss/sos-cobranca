@@ -42,9 +42,6 @@ public class ParcelaService implements Util {
     private EmprestimoService emprestimoService;
 
     @Autowired
-    private UsuarioService usuarioService;
-
-    @Autowired
     private CaixaController caixaController;
 
     @Autowired
@@ -80,43 +77,6 @@ public class ParcelaService implements Util {
         });
 
         return parcelasHomeDTO;
-    }
-
-    public Iterable<ParcelaPorDiaHomeDTO> getPorUsuario(Integer id_usuario) {
-        Iterable<Map<String, Object>> parcelas = repository.findEmAbertoPorUsuario(id_usuario);
-        List<ParcelaPorDiaHomeDTO> parcelasPorDia = new ArrayList<>();
-        parcelas.forEach(parcela -> {
-            AtomicBoolean insere = new AtomicBoolean(true);
-            parcelasPorDia.forEach(pd -> {
-                if (pd.dataVencimento.equals(parcela.get("data_vencimento"))) {
-                    insere.set(false);
-                }
-            });
-
-            if (insere.get()) {
-                ParcelaPorDiaHomeDTO parcelaPorDiaHomeDTO = new ParcelaPorDiaHomeDTO();
-                parcelaPorDiaHomeDTO.dataVencimento = toStr(parcela.get("data_vencimento"));
-                parcelaPorDiaHomeDTO.diaSemana = toStr(parcela.get("dia_semana"));
-                parcelaPorDiaHomeDTO.dia = toStr(parcela.get("dia"));
-                parcelaPorDiaHomeDTO.mes = toStr(parcela.get("mes"));
-                parcelaPorDiaHomeDTO.parcelas = new ArrayList<>();
-
-                parcelasPorDia.add(parcelaPorDiaHomeDTO);
-            }
-        });
-
-        parcelas.forEach(parcela -> {
-            AtomicBoolean insere = new AtomicBoolean(true);
-            parcelasPorDia.forEach(pd -> {
-                if (pd.dataVencimento.equals(parcela.get("data_vencimento"))) {
-                    ParcelaHomeDTO parcelaHomeDTO = new ParcelaHomeDTO(parcela);
-                    parcelaHomeDTO.valorVencimento = calculaJurosAtraso(parcelaHomeDTO);
-                    pd.parcelas.add(parcelaHomeDTO);
-                }
-            });
-        });
-
-        return parcelasPorDia;
     }
 
     public Iterable<ParcelaPorDiaHomeDTO> getEmAbertoPorUsuario(Integer id_usuario) {
@@ -212,7 +172,7 @@ public class ParcelaService implements Util {
     public ParcelaHomeDTO update(Integer id, Parcela d) throws Exception {
         Assert.notNull(id, "Não foi possível atualizar o registro");
 
-        if (d.getStatus() > 0) {
+        if (d.getStatus() > 0){
             verificaParcelaAnteriorEmAberto(d.getIdEmprestimo(), d.getNumero());
         }
 
@@ -228,8 +188,6 @@ public class ParcelaService implements Util {
             //notificação quando a parcela é aprovada
             boolean enviaNotificacaoAprovada = ((c.getStatus() == 1) && (d.getStatus() == 2));
 
-            boolean enviaNotificacaoAnalise = false;
-
             c.setStatus(d.getStatus());
 
             String comprovanteBase64 = d.getComprovante() == null ? "" : d.getComprovante();
@@ -244,8 +202,6 @@ public class ParcelaService implements Util {
                 String urlComprovante = firebaseStorageService.upload(firebase);
 
                 c.setComprovante(urlComprovante);
-
-                enviaNotificacaoAnalise = true;
             }
 
             switch (d.getStatus()) {
@@ -270,63 +226,16 @@ public class ParcelaService implements Util {
 
                     c.setValorPagamento(c.getValorVencimento());
 
-                    //insere o valor no caixa do adm
-                    Map caixa = new LinkedHashMap();
-                    caixa.put("id", 0);
-                    caixa.put("idUsuario", 999); //adm
-                    caixa.put("idParcela", c.getId());
-                    caixa.put("dataMovimento", new Date());
-                    caixa.put("valorMovimento", c.getValorPagamento());
-                    caixa.put("tipo", "C"); //debito
-                    caixa.put("origem", "RP"); //recebimento de parcela
-                    caixa.put("observacoes", "Recebimento da Parcela " + c.getNumero() + " do Empréstimo " + c.getIdEmprestimo());
-
-                    caixaController.postCaixa(caixa);
-
                     break;
             }
 
             Emprestimo e = emprestimoService.getById(c.getIdEmprestimo()).get();
 
-            String obs = "Empréstimo Nº " + e.getId();
+            String obs = new SimpleDateFormat("dd/MM/yyyy hh:mm").format(new Date()) + "\nEmpréstimo Nº " + e.getId();
             obs += "\nParcela Nº " + d.getNumero() + " de " + e.getQuantidadeParcelas() + "\n";
-            if ((enviaNotificacaoCancelada) || (enviaNotificacaoAprovada) || (enviaNotificacaoAnalise)) {
-                List<Integer> idsUsuario = new ArrayList<>();
-
-                String tipo = "";
-                String titulo = "";
-
-                idsUsuario.add(e.getIdUsuario());
-
-                if (enviaNotificacaoCancelada) {
-                    tipo = "C";
-                    titulo = "Parcela cancelada!";
-                }
-
-                if (enviaNotificacaoAprovada) {
-                    tipo = "A";
-                    titulo = "Parcela aprovada!";
-                }
-
-                if (enviaNotificacaoAnalise) {
-                    tipo = "A";
-                    titulo = "Parcela em análise!";
-
-                    //adiciona os usuario administradores.
-                    usuarioService.getUsuariosPorTipo("A").forEach((usuario -> {
-                        idsUsuario.add(usuario.getId());
-                    }));
-                }
-
-                String finalTipo = tipo;
-                String finalTitulo = titulo;
-                String finalObs = obs;
-
-                idsUsuario.forEach((idUsuario -> {
-                    Notificacao n = new Notificacao(0, idUsuario, new Date(), finalTipo, "N", finalTitulo, finalObs + d.getObservacoes());
-                    notificacaoService.insert(n);
-                }));
-
+            if ((enviaNotificacaoCancelada) || (enviaNotificacaoAprovada)) {
+                Notificacao n = new Notificacao(0, e.getIdUsuario(), new Date(), enviaNotificacaoCancelada ? "C" : "A", "N", obs + " - " + d.getObservacoes()); //parcela cancelada
+                notificacaoService.insert(n);
             }
 
             ParcelaHomeDTO p = new ParcelaHomeDTO(repository.save(c), e.getQuantidadeParcelas());
@@ -338,12 +247,10 @@ public class ParcelaService implements Util {
         }
     }
 
-    public boolean verificaParcelaAnteriorEmAberto(Integer id_emprestimo, Integer numero) throws Exception {
+    public void verificaParcelaAnteriorEmAberto(Integer id_emprestimo, Integer numero) throws Exception {
         Integer totalParcelas = repository.totalizaParcelaAnteriorEmAberto(id_emprestimo, numero);
         if (totalParcelas > 0) {
-            throw new Exception("Existem parcelas (" + totalParcelas + ") anteriores em aberto, favor realizar o pagamento dessas parcelas.");
-        } else {
-            return true;
+            throw new Exception("Existem " + totalParcelas + " anteriores em aberto, favor realizar o pagamento dessas parcelas.");
         }
     }
 
@@ -399,22 +306,14 @@ public class ParcelaService implements Util {
         if (optionalTipoEmprestimo.isPresent()) {
             TipoEmprestimo tipoEmprestimo = optionalTipoEmprestimo.get();
 
-            //calculo que o kra passou, voltar depois
-            //    Double valorParcela = (((emprestimo.getValorAprovado() * tipoEmprestimo.getJuros()) / 100) + emprestimo.getValorAprovado()) / tipoEmprestimo.getParcelas();
-
-            Double valorParcela = ((emprestimo.getValorAprovado() * (tipoEmprestimo.getJuros() / 100)) * tipoEmprestimo.getParcelas()) / tipoEmprestimo.getParcelas(); //aqui eu tenho o juro
-            valorParcela = valorParcela + (emprestimo.getValorAprovado() / tipoEmprestimo.getParcelas());
+            Double valorParcela = (((emprestimo.getValorAprovado() * tipoEmprestimo.getJuros()) / 100) + emprestimo.getValorAprovado()) / tipoEmprestimo.getParcelas();
 
             Calendar dataVencimento = Calendar.getInstance();
             dataVencimento.setTime(emprestimo.getDataAprovacao());
 
             for (int i = 1; i <= tipoEmprestimo.getParcelas(); i++) {
-                if (emprestimo.getTipo() == -1) {//alterar depois para 0 a comparação
-                    dataVencimento.add(Calendar.DATE, 1);
-                    dataVencimento = checaFDS(dataVencimento);
-                } else {
-                    dataVencimento.add(Calendar.MONTH, 1);
-                }
+                dataVencimento.add(Calendar.DATE, 1);
+                dataVencimento = checaFDS(dataVencimento);
 
                 Parcela parcela = new Parcela(0, emprestimo.getId(), i, dataVencimento.getTime(), valorParcela, null, 0.0, 0, null, null, 0);
 
@@ -462,7 +361,7 @@ public class ParcelaService implements Util {
                 if (tipoEmprestimo.isPresent()) {
                     Double jurosAtraso = tipoEmprestimo.get().getJurosAtraso();
                     Double valorParcela = pc.valorVencimento;
-                    for (int i = 0; i <= diasAtraso; i++) {
+                    for(int i = 0; i <= diasAtraso; i++){
                         valorParcela = valorParcela + ((valorParcela / 100) * jurosAtraso);
                     }
 
@@ -471,7 +370,7 @@ public class ParcelaService implements Util {
             }
         }
 
-        return pc.valorVencimento;
+        return 0.0;
     }
 
 }

@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
@@ -32,8 +33,6 @@ public class Emprestimo implements Util {
     private Double valorAprovado;
     private Integer idUsuarioAnalise;
     private String observacoes;
-    private Integer tipo;
-    private String documento;
     private Integer quantidadeParcelas;
     @Transient
     private Integer quantidadeParcelasAtraso;
@@ -52,8 +51,6 @@ public class Emprestimo implements Util {
         this.valorAprovado = toDouble(map.get("valor_aprovado"));
         this.idUsuarioAnalise = toInt(map.get("id_usuario_analise"));
         this.observacoes = toStr(map.get("observacoes"));
-        this.tipo = toInt(map.get("tipo"));
-        this.documento = toStr(map.get("documento"));
         this.quantidadeParcelas = toInt(map.get("quantidade_parcelas"));
         this.quantidadeParcelasAtraso = map.get("quantidade_parcelas_atraso") == null ? 0 : toInt(map.get("quantidade_parcelas_atraso"));
         this.quantidadeParcelasAVencer = map.get("quantidade_parcelas_avencer") == null ? 0 : toInt(map.get("quantidade_parcelas_avencer"));

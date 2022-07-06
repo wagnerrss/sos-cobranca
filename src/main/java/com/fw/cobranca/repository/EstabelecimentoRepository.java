@@ -1,8 +1,14 @@
 package com.fw.cobranca.repository;
 
 import com.fw.cobranca.domain.Estabelecimento;
+import com.fw.cobranca.domain.Usuario;
+import com.fw.cobranca.domain.dto.EstabelecimentoDTO;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface EstabelecimentoRepository extends CrudRepository<Estabelecimento, Integer> {
