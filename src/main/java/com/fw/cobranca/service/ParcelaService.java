@@ -409,7 +409,7 @@ public class ParcelaService implements Util {
             dataVencimento.setTime(emprestimo.getDataAprovacao());
 
             for (int i = 1; i <= tipoEmprestimo.getParcelas(); i++) {
-                if (emprestimo.getTipo() == -1) {//alterar depois para 0 a comparação
+                if (emprestimo.getTipo() == 0) {
                     dataVencimento.add(Calendar.DATE, 1);
                     dataVencimento = checaFDS(dataVencimento);
                 } else {
