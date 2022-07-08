@@ -2,7 +2,7 @@ package com.fw.cobranca.api;
 
 import com.fw.cobranca.domain.Emprestimo;
 import com.fw.cobranca.domain.dto.EmprestimoDTO;
-import com.fw.cobranca.service.*;
+import com.fw.cobranca.service.EmprestimoService;
 import com.fw.cobranca.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -70,5 +70,15 @@ public class EmprestimoController implements Util {
                 ResponseEntity.ok().build() :
                 new ResponseEntity<>(cobrancaController.mapErro("DELETE", ""), HttpStatus.BAD_REQUEST);
     }
+
+    @GetMapping("/emprestimo/verifica")
+    public ResponseEntity getVerificaEmprestimoEmAberto(@RequestParam("id_estabelecimento") Integer idEstabelecimento) {
+        try {
+            return ResponseEntity.ok(emprestimoService.verificaEmprestimoEmAberto(idEstabelecimento));
+        } catch (Exception ex) {
+            return new ResponseEntity<>(cobrancaController.mapErro("GET", ex.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+    }
+
 
 }

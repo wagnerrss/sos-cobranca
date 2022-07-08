@@ -4,9 +4,7 @@ import com.fw.cobranca.util.Util;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.sql.Blob;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Map;
 
 @Entity

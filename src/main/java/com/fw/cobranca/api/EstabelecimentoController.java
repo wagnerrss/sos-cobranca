@@ -1,8 +1,8 @@
 package com.fw.cobranca.api;
 
-import com.fw.cobranca.domain.*;
+import com.fw.cobranca.domain.Estabelecimento;
 import com.fw.cobranca.domain.dto.EstabelecimentoDTO;
-import com.fw.cobranca.service.*;
+import com.fw.cobranca.service.EstabelecimentoService;
 import com.fw.cobranca.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

@@ -21,6 +21,7 @@ public class Notificacao implements Util {
     private Date dataNotificacao;
     private String tipo;
     private String lida;
+    private String titulo;
     private String mensagem;
 
     public Notificacao(Map map) {
@@ -29,15 +30,17 @@ public class Notificacao implements Util {
         this.dataNotificacao = map.containsKey("dataNotificacao") ? toDate(map.get("dataNotificacao")) : toDate(map.get("data_notificacao"));
         this.tipo = toStr(map.get("tipo"));
         this.lida = toStr(map.get("lida"));
+        this.titulo =  toStr(map.get("titulo"));
         this.mensagem =  toStr(map.get("mensagem"));
     }
 
-    public Notificacao(Integer id, Integer idUsuario, Date dataNotificacao, String tipo, String lida, String mensagem) {
+    public Notificacao(Integer id, Integer idUsuario, Date dataNotificacao, String tipo, String lida, String titulo, String mensagem) {
         this.id = id;
         this.idUsuario = idUsuario;
         this.dataNotificacao = dataNotificacao;
         this.tipo = tipo;
         this.lida = lida;
+        this.titulo = titulo;
         this.mensagem = mensagem;
     }
 }

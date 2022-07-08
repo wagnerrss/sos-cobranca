@@ -1,3 +1,39 @@
+- verificar se o emprestimo com garantia o vencimento é diário.
+
+alterar o valor do pagamento da parcela
+
+no login do adm quando pesquisar o usario trazer os dados, mesmo quando colaborador
+
+pix
+
+fazer o esqueceu a senha
+
+mensagem de cadastrar não esta fazendo nada
+
+se já tiver algum responsável pelo empréstimo já vir marcado
+
+identificar se é colaborador ou adm na home
+
+quando seta direto o colaborador para o empréstimo não esta enviando notificação para o usuario nem para o colaborador
+
+* não tem como cancelar a parcela aprovada pelo adm
+
+não esquecer de ver o negocio da data que fica errado pelo heroku quando ta perto da meia noite
+
+OK o usuário solicitar um emprestimo vai para o documento do administrador e dos consultores da região
+- pegar os usuarios adm
+- pegar os usuarios da região
+
+OK o administrador define o consultor para a região, vai para o documento do consultor
+
+OK o consultor aceita a análise do emprestimo, vai para o documento do usuario que solicitou
+
+OK o consultor aprovou / negou o emprestimo vai para o usuario que solicitou
+
+quando o usuario paga uma parcela e fica em análise, vai para o administrador
+
+quando o adm aprova / nega o pagamento vai para o usuario
+
 colaborador
 - solicitados e região;
 - emprestimos com parcelas em atraso
@@ -5,9 +41,9 @@ colaborador
 
 bloquear tela quando estiver aguardando alguma resposta
 
-quando cadastra um usuario novo ele fica como U, não aparece para o adm alterar para C, criar opção para o adm cadastrar o usuario e ter as opções do tipo, ou cadastrar colaborador
+OK quando cadastra um usuario novo ele fica como U, não aparece para o adm alterar para C, criar opção para o adm cadastrar o usuario e ter as opções do tipo, ou cadastrar colaborador
 
-notificar o adm quando tiver parcela para analisar
+OK notificar o adm quando tiver parcela para analisar
 
 verificar se tem como ter algum loading imagem
 
@@ -49,12 +85,19 @@ CREATE SEQUENCE public.usuario_id_seq
 create table usuario (
    id integer NOT NULL DEFAULT nextval('usuario_id_seq'::regclass),
    foto varchar(500),
-   tipo varchar(1), 
+   tipo varchar(1),
    documento varchar(20),
-   nome varchar(100), 
-   fone varchar(50),   
+   nome varchar(100),
+   fone varchar(50),
    senha varchar(50)
 );
+
+insert into usuario (id, foto, tipo, documento, nome, fone, senha) values (53, 'https://storage.googleapis.com/sos-cobranca.appspot.com/usuario/11111111111', 'U', '11111111111', 'USUARIO', '11111111111', '123');
+insert into usuario (id, foto, tipo, documento, nome, fone, senha) values (52, 'https://storage.googleapis.com/sos-cobranca.appspot.com/usuario/08203851908', 'A', '99999999999', 'ADM', '11111111111', '123');
+insert into usuario (id, foto, tipo, documento, nome, fone, senha) values (54, 'https://storage.googleapis.com/sos-cobranca.appspot.com/usuario/22222222222', 'C', '22222222222', 'COLABORADOR', '11111111111', '123');
+insert into usuario (id, foto, tipo, documento, nome, fone, senha) values (55, 'https://storage.googleapis.com/sos-cobranca.appspot.com/usuario/11111111111', 'U', '33333333333', 'USUARIO1', '33333333333', '123');
+insert into usuario (id, foto, tipo, documento, nome, fone, senha) values (56, 'https://storage.googleapis.com/sos-cobranca.appspot.com/usuario/11111111111', 'U', '44444444444', 'USUARIO2', '44444444444', '123');
+insert into usuario (id, foto, tipo, documento, nome, fone, senha) values (57, 'https://storage.googleapis.com/sos-cobranca.appspot.com/usuario/11111111111', 'U', '55555555555', 'USUARIO3', '55555555555', '123');
 
 drop table estabelecimento;
 drop sequence public.estabelecimento_id_seq;
@@ -69,6 +112,7 @@ CREATE SEQUENCE public.estabelecimento_id_seq
 create table estabelecimento(
    id integer NOT NULL DEFAULT nextval('estabelecimento_id_seq'::regclass),
    id_usuario integer,
+   id_regiao integer,
    cnpj varchar(20),
    nome varchar(100),
    endereco varchar(200),
@@ -98,11 +142,28 @@ create table tipo_emprestimo(
    descricao varchar(50),
    parcelas integer,
    juros double precision,
-   juros_atraso double precision
+   juros_atraso double precision,
+   tipo integer   -- 0 - diário, 1 - garantia veiculo com documento, 2 - garantia veiculo sem documento, 3 - garantia imovel
 );
 
-insert into tipo_emprestimo(descricao, parcelas, juros, juros_atraso) values ('10X', 10, 10.00, 10.00);
-insert into tipo_emprestimo(descricao, parcelas, juros, juros_atraso) values ('20X', 20, 20.00, 10.00);
+insert into tipo_emprestimo(descricao, parcelas, juros, juros_atraso, tipo) values ('10X', 10, 10.00, 10.00, 0);
+insert into tipo_emprestimo(descricao, parcelas, juros, juros_atraso, tipo) values ('20X', 20, 20.00, 10.00, 0);
+
+insert into tipo_emprestimo(descricao, parcelas, juros, juros_atraso, tipo) values ('10X', 10, 10.00, 10.00, 1);
+insert into tipo_emprestimo(descricao, parcelas, juros, juros_atraso, tipo) values ('20X', 20, 20.00, 10.00, 1);
+insert into tipo_emprestimo(descricao, parcelas, juros, juros_atraso, tipo) values ('30X', 30, 20.00, 10.00, 1);
+insert into tipo_emprestimo(descricao, parcelas, juros, juros_atraso, tipo) values ('40X', 40, 20.00, 10.00, 1);
+
+insert into tipo_emprestimo(descricao, parcelas, juros, juros_atraso, tipo) values ('10X', 10, 10.00, 10.00, 2);
+insert into tipo_emprestimo(descricao, parcelas, juros, juros_atraso, tipo) values ('20X', 20, 20.00, 10.00, 2);
+insert into tipo_emprestimo(descricao, parcelas, juros, juros_atraso, tipo) values ('30X', 30, 20.00, 10.00, 2);
+insert into tipo_emprestimo(descricao, parcelas, juros, juros_atraso, tipo) values ('40X', 40, 20.00, 10.00, 2);
+
+insert into tipo_emprestimo(descricao, parcelas, juros, juros_atraso, tipo) values ('10X', 10, 10.00, 10.00, 3);
+insert into tipo_emprestimo(descricao, parcelas, juros, juros_atraso, tipo) values ('20X', 20, 20.00, 10.00, 3);
+insert into tipo_emprestimo(descricao, parcelas, juros, juros_atraso, tipo) values ('30X', 30, 20.00, 10.00, 3);
+insert into tipo_emprestimo(descricao, parcelas, juros, juros_atraso, tipo) values ('40X', 40, 20.00, 10.00, 3);
+
 
 drop table emprestimo;
 drop sequence public.emprestimo_id_seq;
@@ -120,15 +181,17 @@ create table emprestimo(
    id_usuario integer,
    id_estabelecimento integer,
    data_solicitacao timestamp without time zone,
-   valor_solicitado double precision,   
-   status integer, --0 - aguardando análise, 1 - em análise, 2 - aprovado, 9 - cancelado
+   valor_solicitado double precision,
+   status integer, --0 - aguardando análise, 1 - em análise, 2 - aprovado, 3 - finalizado, 9 - cancelado
    data_aprovacao timestamp without time zone,
    valor_aprovado double precision,
    id_usuario_analise integer,
    observacoes varchar(500),
-   quantidade_parcelas integer
+   quantidade_parcelas integer,
+   tipo integer, -- 0 - diário, 1 - garantia veiculo com documento, 2 - garantia veiculo sem documento, 3 - garantia imovel
+   documento varchar(500)
 );
-	
+
 drop table parcela;
 drop sequence public.parcela_id_seq;
 
@@ -185,10 +248,10 @@ CREATE SEQUENCE public.regiao_id_seq
     CACHE 1;
 
 create table regiao(
-   id integer NOT NULL DEFAULT nextval('regiao_id_seq'::regclass),   
-   regiao varchar(200)   
+   id integer NOT NULL DEFAULT nextval('regiao_id_seq'::regclass),
+   regiao varchar(200)
 );
-	
+
 drop table colaborador_regiao;
 drop sequence public.colaborador_regiao_id_seq;
 
@@ -219,6 +282,7 @@ create table notificacao(
    id integer NOT NULL DEFAULT nextval('notificacao_id_seq'::regclass),
    id_usuario integer,
    data_notificacao timestamp without time zone,
+   titulo varchar(100),
    mensagem varchar(500),
    tipo varchar(1),
    lida varchar(1)

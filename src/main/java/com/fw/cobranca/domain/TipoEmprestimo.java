@@ -15,4 +15,5 @@ public class TipoEmprestimo {
     private int parcelas;
     private double juros;
     private double jurosAtraso;
+    private int tipo;
 }

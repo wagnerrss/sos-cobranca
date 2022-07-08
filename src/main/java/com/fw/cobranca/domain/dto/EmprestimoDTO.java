@@ -22,6 +22,8 @@ public class EmprestimoDTO implements Util {
     public Double valorAprovado;
     public Integer idUsuarioAnalise;
     public String observacoes;
+    public Integer tipo;
+    public String documento;
     public Iterable<Parcela> parcelas;
 
     public EmprestimoDTO(Map<String, Object> map) throws ParseException {
@@ -36,6 +38,8 @@ public class EmprestimoDTO implements Util {
         this.valorAprovado = toDouble(map.get("valor_aprovado"));
         this.idUsuarioAnalise = toInt(map.get("id_usuario_analise"));
         this.observacoes = toStr(map.get("observacoes"));
+        this.tipo = toInt(map.get("tipo"));
+        this.documento = toStr(map.get("documento"));
     }
 
     public EmprestimoDTO(Emprestimo emprestimo) {
@@ -50,5 +54,7 @@ public class EmprestimoDTO implements Util {
         this.valorAprovado = emprestimo.getValorAprovado();
         this.idUsuarioAnalise = emprestimo.getIdUsuarioAnalise();
         this.observacoes = emprestimo.getObservacoes();
+        this.tipo = emprestimo.getTipo();
+        this.documento = emprestimo.getDocumento();
     };
 }

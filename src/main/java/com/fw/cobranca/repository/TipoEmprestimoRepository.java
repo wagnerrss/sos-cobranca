@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface TipoEmprestimoRepository extends CrudRepository<TipoEmprestimo, Integer> {
     Optional<TipoEmprestimo> findByDescricao(String descricao);
+
+    Iterable<TipoEmprestimo> findByTipo(Integer tipo);
 }
