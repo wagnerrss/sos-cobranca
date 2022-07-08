@@ -12,7 +12,6 @@ public class HomeDTOUsuario implements Util {
     public Iterable<Estabelecimento> estabelecimentos;
     public Iterable<Emprestimo> emprestimos;
     public Iterable<ParcelaPorDiaHomeDTO> parcelas;
-    public Double valorParcelasEmAberto;
     public Iterable<TipoEmprestimo> tipoEmprestimos;
     public Integer quantidadeNotificacaoNaoLida;
 }

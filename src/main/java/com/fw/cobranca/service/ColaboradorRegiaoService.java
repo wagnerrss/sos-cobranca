@@ -1,10 +1,11 @@
 package com.fw.cobranca.service;
 
 import com.fw.cobranca.domain.ColaboradorRegiao;
-import com.fw.cobranca.domain.Emprestimo;
+import com.fw.cobranca.domain.Regiao;
 import com.fw.cobranca.domain.Usuario;
 import com.fw.cobranca.domain.dto.RegiaoDTO;
 import com.fw.cobranca.repository.ColaboradorRegiaoRepository;
+import com.fw.cobranca.repository.RegiaoRepository;
 import com.fw.cobranca.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,9 +22,6 @@ public class ColaboradorRegiaoService implements Util {
 
     @Autowired
     private UsuarioService usuarioService;
-
-    @Autowired
-    private EmprestimoService emprestimoService;
 
     public Iterable<ColaboradorRegiao> getColaboradoresRegioes() {
         return repository.findAll();
@@ -60,15 +58,6 @@ public class ColaboradorRegiaoService implements Util {
 
     public Integer deleteByIdRegiao(Integer id_regiao) {
         return repository.deleteByRegiao(id_regiao);
-    }
-
-    public void notificaColaboradorRegiao(Integer id_regiao){
-        repository.emprestimosSemUsuarioAnalise(id_regiao).forEach(id_emprestimo -> {
-            Optional<Emprestimo> emprestimoOptional = emprestimoService.getById(id_emprestimo);
-            if (emprestimoOptional.isPresent()){
-                emprestimoService.notificaUsuarioNovoEmprestimo(emprestimoOptional.get(), false);
-            }
-        });
     }
 
 }

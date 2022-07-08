@@ -1,8 +1,11 @@
 package com.fw.cobranca.service;
 
 import com.fw.cobranca.domain.Caixa;
+import com.fw.cobranca.domain.Notificacao;
 import com.fw.cobranca.domain.Usuario;
 import com.fw.cobranca.domain.dto.CaixaPorDiaDTO;
+import com.fw.cobranca.domain.dto.ParcelaHomeDTO;
+import com.fw.cobranca.domain.dto.ParcelaPorDiaHomeDTO;
 import com.fw.cobranca.repository.CaixaRepository;
 import com.fw.cobranca.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;

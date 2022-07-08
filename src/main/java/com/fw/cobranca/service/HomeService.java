@@ -2,7 +2,6 @@ package com.fw.cobranca.service;
 
 
 import com.fw.cobranca.domain.Emprestimo;
-import com.fw.cobranca.domain.Usuario;
 import com.fw.cobranca.domain.dto.HomeDTOAdministrador;
 import com.fw.cobranca.domain.dto.HomeDTOColaborador;
 import com.fw.cobranca.domain.dto.HomeDTOUsuario;
@@ -11,8 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class HomeService implements Util {
@@ -37,14 +34,8 @@ public class HomeService implements Util {
     @Autowired
     private CaixaService caixaService;
 
-    public Object getDadosHome(Integer id_usuario) throws Exception {
-        Optional<Usuario> usuario = usuarioService.getById(id_usuario);
-        if (!usuario.isPresent()) {
-            throw new Exception("Usuário não encontrado!");
-        }
-
-        switch (usuario.get().getTipo()) {
-
+    public Object getDadosHome(Integer id_usuario) {
+        switch (usuarioService.getById(id_usuario).get().getTipo()) {
             //Administrador
             case "A": {
                 HomeDTOAdministrador homeDTOAdministrador = new HomeDTOAdministrador();
@@ -60,8 +51,6 @@ public class HomeService implements Util {
                 homeDTOAdministrador.totalParcelasAguardandoAnalise = toDouble(parcelaService.getTotalAguardandoAnalise());
 
                 homeDTOAdministrador.parcelasAguardandoAnalise = parcelaService.getAguardandoAnalise();
-
-                homeDTOAdministrador.quantidadeNotificacaoNaoLida = notificacaoService.getQuantidadeNotificacaoNaoLidaPorUsuario(id_usuario);
 
                 homeDTOAdministrador.emprestimosAguardandoAnalise = emprestimoService.getEmprestimosPorStatus(0);
                 homeDTOAdministrador.emprestimosEmAtraso = new ArrayList<>();
@@ -82,7 +71,6 @@ public class HomeService implements Util {
 
                 return homeDTOAdministrador;
             }
-
             //Colaborador
             case "C": {
                 HomeDTOColaborador homeDTOColaborador = new HomeDTOColaborador();
@@ -92,22 +80,7 @@ public class HomeService implements Util {
                 homeDTOColaborador.temSaldo = true;
                 homeDTOColaborador.saldo = caixaService.totalizaSaldo(id_usuario);
 
-                homeDTOColaborador.totalEmprestimosAguardandoAnalise = 0.0;
-                homeDTOColaborador.totalEmprestimosEmAnalise = 0.0;
-                homeDTOColaborador.totalParcelasEmAtraso = 0.0;
-                homeDTOColaborador.totalParcelasAVencer = 0.0;
-
                 homeDTOColaborador.emprestimosAguardandoAnalise = emprestimoService.getEmprestimosPorStatusEIdUsuarioAnalise(0, id_usuario);
-                homeDTOColaborador.emprestimosAguardandoAnalise.forEach(emprestimo -> {
-                    homeDTOColaborador.totalEmprestimosAguardandoAnalise += emprestimo.getValorSolicitado();
-                });
-
-                homeDTOColaborador.emprestimosEmAnalise = emprestimoService.getEmprestimosPorStatusEIdUsuarioAnalise(1, id_usuario);
-                homeDTOColaborador.emprestimosEmAnalise.forEach(emprestimo -> {
-                    homeDTOColaborador.totalEmprestimosEmAnalise += emprestimo.getValorSolicitado();
-                });
-
-                homeDTOColaborador.quantidadeNotificacaoNaoLida = notificacaoService.getQuantidadeNotificacaoNaoLidaPorUsuario(id_usuario);
 
                 homeDTOColaborador.emprestimosEmAtraso = new ArrayList<>();
                 homeDTOColaborador.emprestimosAVencer = new ArrayList<>();
@@ -117,12 +90,10 @@ public class HomeService implements Util {
 
                     if (emprestimo.getQuantidadeParcelasAtraso() > 0) {
                         homeDTOColaborador.emprestimosEmAtraso.add(emprestimo);
-                        homeDTOColaborador.totalParcelasEmAtraso += emprestimo.getQuantidadeParcelasAtraso() * (emprestimo.getValorAprovado() / emprestimo.getQuantidadeParcelas());
                     }
 
                     if (emprestimo.getQuantidadeParcelasAVencer() > 0) {
                         homeDTOColaborador.emprestimosAVencer.add(emprestimo);
-                        homeDTOColaborador.totalParcelasAVencer += emprestimo.getQuantidadeParcelasAVencer() * (emprestimo.getValorAprovado() / emprestimo.getQuantidadeParcelas());
                     }
                 });
 
@@ -140,24 +111,8 @@ public class HomeService implements Util {
 
                 homeDTOUsuario.estabelecimentos = estabelecimentoService.getByIdUsuario(id_usuario);
                 homeDTOUsuario.emprestimos = emprestimoService.getEmprestimosPorIdUsuario(id_usuario);
-
-                Iterable<Map> emprestimosEmAberto = emprestimoService.getEmprestimosPorIdUsuarioEmAberto(id_usuario);
-
-                homeDTOUsuario.valorParcelasEmAberto = 0.00;
-                homeDTOUsuario.parcelas = new ArrayList<>();
-                emprestimosEmAberto.forEach(emprestimo -> {
-                    homeDTOUsuario.parcelas = parcelaService.getPorEmprestimo(toInt(emprestimo.get("id")));
-
-                    homeDTOUsuario.parcelas.forEach(parcelas -> {
-                        parcelas.parcelas.forEach(parcela -> {
-                            if (parcela.valorPagamento <= 0.0) {
-                                homeDTOUsuario.valorParcelasEmAberto += parcela.valorVencimento;
-                            }
-                        });
-                    });
-                });
-
-                homeDTOUsuario.tipoEmprestimos = tipoEmprestimoService.getTipoEmprestimosPorTipo(0);
+                homeDTOUsuario.parcelas = parcelaService.getEmAbertoPorUsuario(id_usuario);
+                homeDTOUsuario.tipoEmprestimos = tipoEmprestimoService.getTipoEmprestimos();
 
                 homeDTOUsuario.quantidadeNotificacaoNaoLida = notificacaoService.getQuantidadeNotificacaoNaoLidaPorUsuario(id_usuario);
 

@@ -1,10 +1,14 @@
 package com.fw.cobranca.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fw.cobranca.domain.Emprestimo;
+import com.fw.cobranca.domain.Parcela;
 import com.fw.cobranca.domain.Regiao;
 import com.fw.cobranca.util.Util;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 

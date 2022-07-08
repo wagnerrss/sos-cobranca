@@ -2,8 +2,7 @@ package com.fw.cobranca.api;
 
 import com.fw.cobranca.domain.ColaboradorRegiao;
 import com.fw.cobranca.domain.dto.RegiaoDTO;
-import com.fw.cobranca.service.ColaboradorRegiaoService;
-import com.fw.cobranca.service.RegiaoService;
+import com.fw.cobranca.service.*;
 import com.fw.cobranca.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -45,8 +44,6 @@ public class RegiaoController implements Util {
             });
 
             RegiaoDTO regiaoDTO = regiaoService.getById(idRegiao);
-
-            colaboradorRegiaoService.notificaColaboradorRegiao(idRegiao);
 
             return regiaoDTO != null ?
                     new ResponseEntity<>(regiaoDTO, HttpStatus.CREATED) :

@@ -48,6 +48,8 @@ public class FirebaseStorageService {
     public String upload(UploadInput uploadInput) {
         System.out.println(bucket);
 
+//        Blob blob = bucket.create("nome.txt", "Wagner Souza".getBytes(), "text/html");
+
         byte[] bytes = Base64.getDecoder().decode(uploadInput.getBase64());
 
         String filename = uploadInput.getFilename();
