@@ -2,7 +2,6 @@ package com.fw.cobranca.service;
 
 
 import com.fw.cobranca.domain.Notificacao;
-
 import com.fw.cobranca.domain.Usuario;
 import com.fw.cobranca.repository.NotificacaoRepository;
 import com.fw.cobranca.util.Util;
@@ -10,12 +9,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.util.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Optional;
 
 @Service
 public class NotificacaoService implements Util {
     @Autowired
     private NotificacaoRepository repository;
+
+    @Autowired
+    private  PushService pushService;
 
     @Autowired
     private UsuarioService usuarioService;
@@ -29,7 +33,13 @@ public class NotificacaoService implements Util {
     }
 
     public Integer getQuantidadeNotificacaoNaoLidaPorUsuario(Integer id_usuario) {
-        return repository.quantidadeNotificacaoNaoLidaPorUsuario(id_usuario);
+        Optional<Usuario> u = usuarioService.getById(id_usuario);
+
+        if (u.get().getTipo() == "A"){
+            return repository.quantidadeNotificacaoNaoLidaAdministrador();
+        } else {
+            return repository.quantidadeNotificacaoNaoLidaPorUsuario(id_usuario);
+        }
     }
 
     public Notificacao insert(Notificacao c) {
@@ -41,6 +51,9 @@ public class NotificacaoService implements Util {
 
         c.setLida("N");
         c.setDataNotificacao(new Date());
+        c.setMensagem(new SimpleDateFormat("dd/MM/yyyy HH:mm").format(new Date()) + "\n" + c.getMensagem());
+
+        pushService.enviarPush(usuario.get().getDocumento(), c.getTitulo(), c.getMensagem());
 
         return repository.save(c);
     }

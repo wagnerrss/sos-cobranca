@@ -2,11 +2,9 @@ package com.fw.cobranca.util;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -16,7 +14,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Type;
 import java.text.*;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -362,7 +359,13 @@ public interface Util {
         try {
             DecimalFormat f = new DecimalFormat(Format.trim().equals("") ? "###,###,##0.00" : Format);
 
-            return f.format(Value);
+            String ret = f.format(Value);
+
+            ret = "R$ " + ret.replace(",", ";");
+            ret = ret.replace(".", ",");
+            ret = ret.replace(";", ".");
+
+            return ret;
 
         } catch (Exception e) {
             return toStr(Value);
@@ -877,5 +880,21 @@ public interface Util {
 
         return data;
     }
+
+    public default String tipoToStr(Integer tipo) {
+        switch (tipo) {
+            case 0:
+                return "Diário";
+            case 1:
+                return "Garantia - Veículo com documento";
+            case 2:
+                return "Garantia - Veículo sem documento";
+            case 3:
+                return "Garantia - Imóvel";
+            default:
+                return "Diário";
+        }
+    }
+
 
 }

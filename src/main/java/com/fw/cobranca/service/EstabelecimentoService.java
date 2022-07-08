@@ -1,12 +1,10 @@
 package com.fw.cobranca.service;
 
 
-import com.fw.cobranca.domain.Emprestimo;
 import com.fw.cobranca.domain.Estabelecimento;
 import com.fw.cobranca.domain.Regiao;
 import com.fw.cobranca.domain.dto.EmprestimoDTO;
 import com.fw.cobranca.domain.dto.EstabelecimentoDTO;
-import com.fw.cobranca.repository.EmprestimoRepository;
 import com.fw.cobranca.repository.EstabelecimentoRepository;
 import com.fw.cobranca.upload.FirebaseStorageService;
 import com.fw.cobranca.upload.UploadInput;
@@ -15,8 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.util.Optional;
-import java.util.OptionalInt;
-import java.util.stream.Collectors;
 
 @Service
 public class EstabelecimentoService {
@@ -25,6 +21,9 @@ public class EstabelecimentoService {
 
     @Autowired
     private EmprestimoService emprestimoService;
+
+    @Autowired
+    private UsuarioService usuarioService;
 
     @Autowired
     private RegiaoService regiaoService;
@@ -43,6 +42,7 @@ public class EstabelecimentoService {
 
         Iterable<EmprestimoDTO> emprestimos = emprestimoService.getByIdEstabelecimento(id);
         estabelecimentoDTO.emprestimos = emprestimos;
+        estabelecimentoDTO.usuario = usuarioService.getById(estabelecimentoDTO.idUsuario).get();
 
         return estabelecimentoDTO;
     }
@@ -80,11 +80,13 @@ public class EstabelecimentoService {
             throw new RuntimeException("Não foi possível inserir o registro");
         }
 
-        Optional opRegiao = regiaoService.getByRegiao(c.getBairro().toUpperCase());
+        String strRegiao = c.getBairro().toUpperCase() + " - " + c.getCidade().toUpperCase() + " - " + c.getEstado().toUpperCase();
+        Optional<Regiao> opRegiao = regiaoService.getByRegiao(strRegiao);
         if (!opRegiao.isPresent()) {
-            String strRegiao = c.getBairro().toUpperCase() + " - " + c.getCidade().toUpperCase() + " - " + c.getEstado().toUpperCase();
             regiaoService.insert(new Regiao(0, strRegiao));
+            opRegiao = regiaoService.getByRegiao(strRegiao);
         }
+        c.setIdRegiao(opRegiao.get().getId());
 
         String comprovanteBase64 = c.getComprovante();
 

@@ -1,6 +1,5 @@
 package com.fw.cobranca.repository;
 
-import com.fw.cobranca.domain.Emprestimo;
 import com.fw.cobranca.domain.Usuario;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;

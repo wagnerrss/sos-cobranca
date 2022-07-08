@@ -18,6 +18,10 @@ public class TipoEmprestimoService {
         return repository.findAll();
     }
 
+    public Iterable<TipoEmprestimo> getTipoEmprestimosPorTipo(Integer tipo) {
+        return repository.findByTipo(tipo);
+    }
+
     public Optional<TipoEmprestimo> getById(Integer id) {
         return repository.findById(id);
     }
@@ -49,6 +53,7 @@ public class TipoEmprestimoService {
             c.setDescricao(d.getDescricao());
             c.setParcelas(d.getParcelas());
             c.setJuros(d.getJuros());
+            c.setTipo(d.getTipo());
 
             repository.save(c);
 

@@ -1,12 +1,9 @@
 package com.fw.cobranca.domain.dto;
 
-import com.fw.cobranca.domain.Emprestimo;
 import com.fw.cobranca.domain.Estabelecimento;
+import com.fw.cobranca.domain.Usuario;
 import com.fw.cobranca.util.Util;
-import lombok.Data;
-import org.aspectj.weaver.AjAttribute;
 
-import javax.persistence.*;
 import java.util.Map;
 
 public class EstabelecimentoDTO implements Util {
@@ -25,6 +22,7 @@ public class EstabelecimentoDTO implements Util {
     public String fone;
     public String comprovante;
     public String observacoes;
+    public Usuario usuario;
     public Iterable<EmprestimoDTO> emprestimos;
 
     public EstabelecimentoDTO(Estabelecimento estabelecimento) {

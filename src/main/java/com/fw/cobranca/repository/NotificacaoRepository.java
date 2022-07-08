@@ -10,5 +10,8 @@ public interface NotificacaoRepository extends CrudRepository<Notificacao, Integ
 
     @Query(value = " SELECT COUNT(ID) FROM NOTIFICACAO WHERE LIDA = 'N' AND ID_USUARIO = :ID_USUARIO ", nativeQuery = true)
     Integer quantidadeNotificacaoNaoLidaPorUsuario(@Param("ID_USUARIO") Integer ID_USUARIO);
+
+    @Query(value = " SELECT COUNT(N.ID) FROM NOTIFICACAO N JOIN USUARIO U ON U.ID = N.ID_USUARIO WHERE U.TIPO = 'A' AND N.LIDA = 'N' ", nativeQuery = true)
+    Integer quantidadeNotificacaoNaoLidaAdministrador();
 }
 

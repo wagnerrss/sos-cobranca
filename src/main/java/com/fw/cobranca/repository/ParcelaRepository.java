@@ -1,8 +1,6 @@
 package com.fw.cobranca.repository;
 
-import com.fw.cobranca.domain.Emprestimo;
 import com.fw.cobranca.domain.Parcela;
-import com.fw.cobranca.domain.dto.ParcelaHomeDTO;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -91,21 +89,22 @@ public interface ParcelaRepository extends CrudRepository<Parcela, Integer> {
             " P.NUMERO, " +
             " P.STATUS, " +
             " TP.PARCELAS, " +
+            " ES.NOME NOME_ESTABELECIMENTO, " +
             " TO_CHAR(CAST(P.DATA_PAGAMENTO AS DATE), 'DD/MM/YYYY') DATA_PAGAMENTO, " +
             " COALESCE(P.VALOR_PAGAMENTO, 0.0) VALOR_PAGAMENTO, " +
             " P.ID_USUARIO, " +
             " P.OBSERVACOES, " +
             " P.COMPROVANTE, " +
-            " ES.NOME NOME_ESTABELECIMENTO, " +
             " CASE WHEN COALESCE(P.VALOR_PAGAMENTO, 0.0) <= 0.0 THEN " +
             " CASE WHEN CAST(CURRENT_DATE - CAST(P.DATA_VENCIMENTO AS DATE) AS INTEGER) > 0 THEN 'S' ELSE 'N' END ELSE 'N' END ATRASO " +
             "FROM PARCELA P  " +
             "JOIN EMPRESTIMO E ON E.ID = P.ID_EMPRESTIMO AND E.STATUS = 2 " +
             "JOIN ESTABELECIMENTO ES ON ES.ID = E.ID_ESTABELECIMENTO " +
             "JOIN TIPO_EMPRESTIMO TP ON TP.ID = E.ID_TIPO " +
-            "WHERE E.ID = :ID_EMPRESTIMO  " +
+            "WHERE P.STATUS = 1  " +
+            "AND COALESCE(P.VALOR_PAGAMENTO, 0.0) > 0.00 " +
             "ORDER BY P.NUMERO ", nativeQuery = true)
-    Iterable<Map<String, Object>> findPorEmprestimo(@Param("ID_EMPRESTIMO") Integer ID_EMPRESTIMO);
+    Iterable<Map<String, Object>> findAguardandoAnalise();
 
     @Query(value = " SELECT  " +
             " P.ID, " +
@@ -139,22 +138,22 @@ public interface ParcelaRepository extends CrudRepository<Parcela, Integer> {
             " P.NUMERO, " +
             " P.STATUS, " +
             " TP.PARCELAS, " +
-            " ES.NOME NOME_ESTABELECIMENTO, " +
             " TO_CHAR(CAST(P.DATA_PAGAMENTO AS DATE), 'DD/MM/YYYY') DATA_PAGAMENTO, " +
             " COALESCE(P.VALOR_PAGAMENTO, 0.0) VALOR_PAGAMENTO, " +
             " P.ID_USUARIO, " +
             " P.OBSERVACOES, " +
             " P.COMPROVANTE, " +
+            " ES.NOME NOME_ESTABELECIMENTO, " +
+            " CASE WHEN ((COALESCE(P.VALOR_PAGAMENTO, 0.0) > 0.0) AND (P.STATUS = 2)) THEN 1 ELSE 0 END ORDENA, " +
             " CASE WHEN COALESCE(P.VALOR_PAGAMENTO, 0.0) <= 0.0 THEN " +
             " CASE WHEN CAST(CURRENT_DATE - CAST(P.DATA_VENCIMENTO AS DATE) AS INTEGER) > 0 THEN 'S' ELSE 'N' END ELSE 'N' END ATRASO " +
             "FROM PARCELA P  " +
             "JOIN EMPRESTIMO E ON E.ID = P.ID_EMPRESTIMO AND E.STATUS = 2 " +
             "JOIN ESTABELECIMENTO ES ON ES.ID = E.ID_ESTABELECIMENTO " +
             "JOIN TIPO_EMPRESTIMO TP ON TP.ID = E.ID_TIPO " +
-            "WHERE P.STATUS = 1  " +
-            "AND COALESCE(P.VALOR_PAGAMENTO, 0.0) > 0.00 " +
-            "ORDER BY P.NUMERO ", nativeQuery = true)
-    Iterable<Map<String, Object>> findAguardandoAnalise();
+            "WHERE E.ID = :ID_EMPRESTIMO  " +
+            "ORDER BY ORDENA, P.NUMERO ", nativeQuery = true)
+    Iterable<Map<String, Object>> findPorEmprestimo(@Param("ID_EMPRESTIMO") Integer ID_EMPRESTIMO);
 
     @Query(value = "SELECT SUM(P.VALOR_PAGAMENTO) FROM PARCELA P " +
             " JOIN EMPRESTIMO E ON E.ID = P.ID_EMPRESTIMO AND E.STATUS = 2 " +
@@ -181,8 +180,7 @@ public interface ParcelaRepository extends CrudRepository<Parcela, Integer> {
     @Query(value = " SELECT COUNT(*) FROM PARCELA " +
             " WHERE ID_EMPRESTIMO = :ID_EMPRESTIMO " +
             " AND NUMERO < :NUMERO " +
-            " AND VALOR_PAGAMENTO <= 0.0 " +
-            " ORDER BY NUMERO ", nativeQuery = true)
+            " AND VALOR_PAGAMENTO <= 0.0 " , nativeQuery = true)
     Integer totalizaParcelaAnteriorEmAberto(@Param("ID_EMPRESTIMO") Integer ID_EMPRESTIMO,
                                             @Param("NUMERO") Integer NUMERO);
 
