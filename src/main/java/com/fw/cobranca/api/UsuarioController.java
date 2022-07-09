@@ -2,6 +2,7 @@ package com.fw.cobranca.api;
 
 import com.fw.cobranca.domain.Usuario;
 import com.fw.cobranca.service.UsuarioService;
+import com.fw.cobranca.service.VersaoService;
 import com.fw.cobranca.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,14 @@ public class UsuarioController implements Util {
 
     @Autowired
     UsuarioService usuarioService;
+
+    @Autowired
+    VersaoService versaoService;
+
+    @GetMapping("/versao")
+    public ResponseEntity<String> getVersao() {
+        return ResponseEntity.ok(versaoService.getVersao().getStatus());
+    }
 
     @GetMapping("/usuario")
     public ResponseEntity<Iterable<Usuario>> getUsuario() {

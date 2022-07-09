@@ -18,10 +18,19 @@ public class LoginService implements Util {
     @Autowired
     private UserDetailsService userDetailsService;
 
+    @Autowired
+    private VersaoService versaoService;
+
     public Usuario findUser(Map login) {
-        return loginRepository.findByUsernamePassword(
+        Usuario usuario = loginRepository.findByUsernamePassword(
                 toStr(login.get("usuario")).toUpperCase().trim(),
                 toStr(login.get("senha")));
+
+        if ((usuario.getStatus() == null) || (usuario.getStatus().isEmpty())) {
+            usuario.setStatus(versaoService.getVersao().getStatus());
+        }
+
+        return usuario;
     }
 
 }

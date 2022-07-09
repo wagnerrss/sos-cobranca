@@ -102,11 +102,12 @@ CREATE SEQUENCE public.usuario_id_seq
 create table usuario (
    id integer NOT NULL DEFAULT nextval('usuario_id_seq'::regclass),
    foto varchar(500),
-   tipo varchar(1),
+   tipo char(1),
    documento varchar(20),
    nome varchar(100),
    fone varchar(50),
-   senha varchar(50)
+   senha varchar(50),
+   status char(1)
 );
 
 insert into usuario (id, foto, tipo, documento, nome, fone, senha) values (53, 'https://storage.googleapis.com/sos-cobranca.appspot.com/usuario/11111111111', 'U', '11111111111', 'USUARIO', '11111111111', '123');

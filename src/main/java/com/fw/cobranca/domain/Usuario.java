@@ -20,6 +20,7 @@ public class Usuario implements Util {
     private String nome;
     private String fone;
     private String senha;
+    private String status;
 
     public Usuario() {
     }
@@ -32,5 +33,6 @@ public class Usuario implements Util {
         this.nome = toStr(map.get("nome"));
         this.fone = toStr(map.get("fone"));
         this.senha = toStr(map.get("senha"));
+        this.status = toStr(map.get("status"));
     }
 }
