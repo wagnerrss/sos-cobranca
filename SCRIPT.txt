@@ -71,6 +71,23 @@ no empréstimo, sempre ao clicar, atualizar a informação dele.
 
 Empréstimo, o cliente vai solicitar o empréstimo dizendo o valor que ele quer, que vai ficar "aguardando análise", o cosultor vai selecionar o emprestimo para deixar "em análise", depois que a analise for feita vai para Aprovado ou Cancelado.
 
+drop table versao;
+drop sequence public.versao_id_seq;
+
+CREATE SEQUENCE public.versao_id_seq
+    INCREMENT 1
+    START 1
+    MINVALUE 1
+    MAXVALUE 2147483647
+    CACHE 1;
+
+create table versao(
+   id integer NOT NULL DEFAULT nextval('versao_id_seq'::regclass),
+   versao varchar(20),
+   status char(1)
+);
+
+insert into versao(versao, status) values ('1.0.0', 'H');
 
 drop table usuario;
 drop sequence public.usuario_id_seq;

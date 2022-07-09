@@ -1,6 +1,7 @@
 package com.fw.cobranca.domain.dto;
 
 import com.fw.cobranca.domain.Emprestimo;
+import com.fw.cobranca.domain.Versao;
 import com.fw.cobranca.util.Util;
 
 import java.util.List;
@@ -18,5 +19,7 @@ public class HomeDTOAdministrador implements Util {
     public List<Emprestimo> emprestimosAVencer;
     public Iterable<ParcelaHomeDTO> parcelasAguardandoAnalise;
     public Integer quantidadeNotificacaoNaoLida;
+
+    public Versao versao;
 
 }

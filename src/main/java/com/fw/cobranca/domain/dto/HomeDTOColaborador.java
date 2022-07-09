@@ -1,6 +1,7 @@
 package com.fw.cobranca.domain.dto;
 
 import com.fw.cobranca.domain.Emprestimo;
+import com.fw.cobranca.domain.Versao;
 import com.fw.cobranca.util.Util;
 
 import java.util.List;
@@ -20,4 +21,7 @@ public class HomeDTOColaborador implements Util {
     public Double totalEmprestimosEmAnalise;
     public Double totalParcelasEmAtraso;
     public Double totalParcelasAVencer;
+
+    public Versao versao;
+
 }

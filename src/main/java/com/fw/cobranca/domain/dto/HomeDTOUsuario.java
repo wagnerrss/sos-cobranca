@@ -3,6 +3,7 @@ package com.fw.cobranca.domain.dto;
 import com.fw.cobranca.domain.Emprestimo;
 import com.fw.cobranca.domain.Estabelecimento;
 import com.fw.cobranca.domain.TipoEmprestimo;
+import com.fw.cobranca.domain.Versao;
 import com.fw.cobranca.util.Util;
 
 public class HomeDTOUsuario implements Util {
@@ -15,4 +16,7 @@ public class HomeDTOUsuario implements Util {
     public Double valorParcelasEmAberto;
     public Iterable<TipoEmprestimo> tipoEmprestimos;
     public Integer quantidadeNotificacaoNaoLida;
+
+    public Versao versao;
+
 }

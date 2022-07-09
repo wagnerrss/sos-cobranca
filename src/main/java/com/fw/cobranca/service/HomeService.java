@@ -37,6 +37,9 @@ public class HomeService implements Util {
     @Autowired
     private CaixaService caixaService;
 
+    @Autowired
+    private VersaoService versaoService;
+
     public Object getDadosHome(Integer id_usuario) throws Exception {
         Optional<Usuario> usuario = usuarioService.getById(id_usuario);
         if (!usuario.isPresent()) {
@@ -79,6 +82,8 @@ public class HomeService implements Util {
                     }
 
                 });
+
+                homeDTOAdministrador.versao = versaoService.getVersao();
 
                 return homeDTOAdministrador;
             }
@@ -126,6 +131,8 @@ public class HomeService implements Util {
                     }
                 });
 
+                homeDTOColaborador.versao = versaoService.getVersao();
+
                 return homeDTOColaborador;
             }
 
@@ -160,6 +167,8 @@ public class HomeService implements Util {
                 homeDTOUsuario.tipoEmprestimos = tipoEmprestimoService.getTipoEmprestimosPorTipo(0);
 
                 homeDTOUsuario.quantidadeNotificacaoNaoLida = notificacaoService.getQuantidadeNotificacaoNaoLidaPorUsuario(id_usuario);
+
+                homeDTOUsuario.versao = versaoService.getVersao();
 
                 return homeDTOUsuario;
             }
